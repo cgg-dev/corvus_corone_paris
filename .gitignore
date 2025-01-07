@@ -1,0 +1,4 @@
+.snakemake
+.venv
+data
+pipeline.yaml
