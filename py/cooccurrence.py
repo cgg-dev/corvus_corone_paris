@@ -7,8 +7,8 @@
 #   population geodataframe
 #
 # parameters:
-#   min_days    min distinct days of presence(for an individual to be considered.
-#   restrict_y  expects a 'year' column in the areas geodataframe and only considered said year for matching positions.
+#   min_days    min distinct days of presence for an individual to be considered.
+#   restrict_y  expects a 'year' column in the areas geodataframe and only consider said year for matching positions.
 #
 
 import geopandas as gpd

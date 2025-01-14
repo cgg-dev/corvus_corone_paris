@@ -1,7 +1,7 @@
 configfile: "pipeline.yaml"
 
 #
-# transform RAW Data
+# transform raw data
 #
 rule load:
     input:

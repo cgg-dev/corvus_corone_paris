@@ -7,6 +7,6 @@ territorial_season_months: [5,6,7,8,9,10,11,12]
 
 natal_territories:
     clust_dist_threshold: 30
-    clust_min_core_points: 3
+    clust_min_core_points: 9
     clust_min_days: 3
     cooccur_min_days: 3

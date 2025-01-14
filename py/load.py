@@ -6,7 +6,9 @@ import pandas as pd
 import numpy as np
 
 
+#
 # load
+#
 
 colmap = {
 	'individual-local-identifier': 'ind',
@@ -29,10 +31,13 @@ df = df.rename(index={x:x[0:4] for x in df.index.get_level_values(0)}, level=0).
 idf = pd.read_csv(snakemake.input[1], index_col='ind')
 
 
-# filter points that are marked as non-physiological in individuals.csv.
-# these are from GPS tags that are known to be 'lost' but still exist in the dataset.
-# in some cases these points have been removed upstream at the level of movebank.
+#
+# filter
+#
 
+# Filter points that are marked as non-physiological in individuals.csv.
+# These are from GPS tags that are known to be 'lost' but still exist in the dataset.
+# In some cases these points have been removed upstream at the level of movebank.
 def filter_losttags(df:pd.DataFrame, individuals:pd.DataFrame, verbose:bool=False) -> pd.DataFrame:
     jdf = df.join(individuals)
     rm = jdf.loc[jdf.index.get_level_values(1) > jdf.tag_lost]
@@ -43,9 +48,11 @@ def filter_losttags(df:pd.DataFrame, individuals:pd.DataFrame, verbose:bool=Fals
 df = filter_losttags(df, idf, True)
 
 
-# features
+#
+# featurize
+#
 
-def feat_cohort(df:pd.DataFrame, idf:pd.DataFrame, cutoff_dm:str='01-01') -> pd.Series:
+def feat_cohort(df:pd.DataFrame, idf:pd.DataFrame) -> pd.Series:
     # don't consider rescues as part of a cohort
     return df.join(idf.loc[idf.rescue.fillna(0.) == 0.]).birthyear
 
@@ -62,5 +69,8 @@ df['cohort'] = feat_cohort(df, idf)
 df['age'] = feat_age_at_point(df, idf, snakemake.config['age_cutoff'])
 
 
+#
 # output
+#
+
 df.to_parquet(snakemake.output[0])
