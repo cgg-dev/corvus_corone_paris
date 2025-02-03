@@ -41,7 +41,7 @@ def clusterize(gdf):
             index.append(cl)
         npoints.append(gdf_cluster.shape[0])
         ndays.append(n)
-        geom.append(MultiPoint([[x,y] for x, y in zip(gdf_core.geometry.x, gdf_core.geometry.y)]).convex_hull)
+        geom.append(MultiPoint(gpd.points_from_xy(gdf_core.geometry.x, gdf_core.geometry.y)).convex_hull)
 
     return None if not len(geom) \
         else gpd.GeoDataFrame(
