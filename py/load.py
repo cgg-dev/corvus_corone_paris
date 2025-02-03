@@ -53,12 +53,11 @@ df = filter_losttags(df, idf, True)
 #
 
 def feat_cohort(df:pd.DataFrame, idf:pd.DataFrame) -> pd.Series:
-    # don't consider rescues as part of a cohort
-    return df.join(idf.loc[idf.rescue.fillna(0.) == 0.]).birthyear
+    return df.join(idf).cohort
 
 def feat_age_at_point(df:pd.DataFrame, idf:pd.DataFrame, cutoff_md:str='01-01') -> pd.Series:
     m, d = cutoff_md.split('-')
-    jdf = df.join(idf)
+    jdf = df.join(idf, rsuffix='_r')
     ts = jdf.index.get_level_values(1)
     age = ts.year - jdf.birthyear
     age.loc[ts.month < float(m)] -= 1

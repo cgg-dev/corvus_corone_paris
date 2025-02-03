@@ -50,7 +50,7 @@ rule extract_cohorts_juvenile_nights:
     run:
         import geopandas as gpd
         gdf_population = gpd.read_parquet(input[0])
-        gdf_night = gdf_population.loc[~gdf_population.cohort.isna()]
+        gdf_night = gdf_population.loc[gdf_population.cohort.isin(config['natal_territories']['cohorts'])]
         gdf_night = gdf_night.loc[gdf_night.age == 0.]
         gdf_night = gdf_night.loc[gdf_night.sunpos=='night']
         gdf_night.index = gdf_night.index.remove_unused_levels()
@@ -79,7 +79,7 @@ rule add_natal_territory_candidates_years:
     run:
         import geopandas as gpd
         import pandas as pd
-        years = gpd.read_parquet(input[1]).groupby(level=0).apply(lambda x: x.cohort.iloc[0].astype(int)).rename('year')
+        years = gpd.read_parquet(input[1]).groupby(level=0).apply(lambda x: x.index.get_level_values(1).year[0]).rename('year')
         areas = gpd.read_parquet(input[0]).join(years, on='ind')
         cols = areas.columns.to_list()
         areas[cols[-1:] + cols[:-1]].to_parquet(output[0])
