@@ -11,3 +11,6 @@ natal_territories:
     clust_min_core_points: 9
     clust_min_days: 3
     cooccur_min_days: 3
+
+movement:
+    range_daily_min_points: 2

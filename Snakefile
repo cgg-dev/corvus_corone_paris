@@ -1,5 +1,11 @@
 configfile: "pipeline.yaml"
 
+# pseudo rule
+rule all:
+    input:
+        "data/processed/movement_daily_range.parquet",
+        "data/geometries/natal_territories.gpkg"
+
 #
 # transform raw data
 #
@@ -121,3 +127,16 @@ rule package_natal_territory_candidates:
     run:
         import geopandas as gpd
         gpd.read_parquet(input[0]).loc[(slice(None),1),:].droplevel(1).to_file(output[0], layer='natal_territories')
+
+#
+# derive movement metrics
+#
+rule estimate_daily_range:
+    input:
+        "data/processed/clean.parquet"
+    output:
+        "data/processed/movement_daily_range.parquet"
+    params:
+        daily_min_points=config['movement']['range_daily_min_points']
+    script:
+        "py/movement_range_estimate.py"
