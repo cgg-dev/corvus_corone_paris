@@ -1,4 +1,6 @@
 .snakemake
 .venv
-data
+data/raw/movebank.csv
+data/processed
+data/geometries
 pipeline.yaml
