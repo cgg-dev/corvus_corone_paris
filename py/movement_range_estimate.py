@@ -1,9 +1,16 @@
+#
+# estimate daily range based on existing points
+#
+# For each individual and each day, enclose points inside the smallest possible rotated rectangle, then return the length of the diagonal as 
+# an approximation of the covered area.
+# This doesn't discount night roosts. The method is vulnerable to data scarcity.
+#
+
 import geopandas as gpd
 import pandas as pd
 import numpy as np
 from shapely import MultiPoint, LineString
 
-# encloses points in the smallest possible (rotated) rectangle and returns the length of the diagonal
 def range_rectangle(gdf:gpd.GeoDataFrame) -> np.ndarray:
     if gdf.shape[0] <= 1:
         return np.nan
