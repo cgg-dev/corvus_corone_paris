@@ -16,17 +16,23 @@ colmap = {
 	'location-lat': 'lat',
 	'location-long': 'long',
 	'battery-charge-percent': 'battery',
+    'orn:transmission-protocol': 'protocol' # used for filtering
 }
 dtypes = {
 	'location-lat': np.float64,
 	'location-long': np.float64,
 	'battery-charge-percent': np.float64,
+    'orn:transmission-protocol': str
 }
 
 df = pd.read_csv(snakemake.input[0], dtype=dtypes, usecols=list(colmap.keys())).rename(colmap, axis=1)
+# Some 2024 tags were configured with SMS transmission on top of GPRS, presumably as a fallback for the rural cohort.
+# This only resulted in low-quality duplicates -> remove these points
+df = df.loc[df.protocol != 'SMS'].drop(columns='protocol')
 df['ts'] = pd.to_datetime(df.ts, utc=True)
 df = df.set_index(['ind', 'ts']).sort_index()
-# remove extraneous FRP identifier from individual names ; drop the 5 rescued individuals from the 2022 experiment
+# Remove the extraneous FRP identifier from individual names ; drop the 5 rescued individuals from the 2022 release experiment.
+# This experiment didn't yield data - none of the released individuals survived past a couple days.
 df = df.rename(index={x:x[0:4] for x in df.index.get_level_values(0)}, level=0).drop('[FRP', axis=0)
 idf = pd.read_csv(snakemake.input[1], index_col='ind')
 
