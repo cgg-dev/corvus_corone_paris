@@ -34,6 +34,14 @@ rule filter:
     script:
         "py/filter.py"
 
+rule model_make_night_roosts_median:
+    input:
+        "data/processed/clean.parquet"
+    output:
+        "data/processed/m_night_roosts_median.parquet"
+    script:
+        "py/model_night_roosts_median.py"
+
 #
 # extract natal territories candidates
 #
