@@ -16,7 +16,7 @@ colmap = {
 	'location-lat': 'lat',
 	'location-long': 'long',
 	'battery-charge-percent': 'battery',
-    'orn:transmission-protocol': 'protocol' # used for filtering
+    'orn:transmission-protocol': 'protocol' # only used for filtering SMS data
 }
 dtypes = {
 	'location-lat': np.float64,
@@ -26,13 +26,12 @@ dtypes = {
 }
 
 df = pd.read_csv(snakemake.input[0], dtype=dtypes, usecols=list(colmap.keys())).rename(colmap, axis=1)
-# Some 2024 tags were configured with SMS transmission on top of GPRS, presumably as a fallback for the rural cohort.
-# This only resulted in low-quality duplicates -> remove these points
+# Some 2024 tags had SMS transmission enabled as a fallback when GPRS would fail.
+# This results in low-quality duplicates as the transmitters buffered these fixes and sent them again later with more details when GPRS was restored.
 df = df.loc[df.protocol != 'SMS'].drop(columns='protocol')
 df['ts'] = pd.to_datetime(df.ts, utc=True)
 df = df.set_index(['ind', 'ts']).sort_index()
-# Remove the extraneous FRP identifier from individual names ; drop the 5 rescued individuals from the 2022 release experiment.
-# This experiment didn't yield data - none of the released individuals survived past a couple days.
+# Remove the extraneous FRP identifier from individual names ; drop the 5 rescued individuals from the 2022 release experiment as it yielded little data.
 df = df.rename(index={x:x[0:4] for x in df.index.get_level_values(0)}, level=0).drop('[FRP', axis=0)
 idf = pd.read_csv(snakemake.input[1], index_col='ind')
 
@@ -41,9 +40,8 @@ idf = pd.read_csv(snakemake.input[1], index_col='ind')
 # filter
 #
 
-# Filter points that are marked as non-physiological in individuals.csv.
-# These are from GPS tags that are known to be 'lost' but still exist in the dataset.
-# In some cases these points have been removed upstream at the level of movebank.
+# Filter points that are marked as 'non-physiological' in individuals.csv.
+# In some cases these points have also been deassociated upstream (in movebank).
 def filter_losttags(df:pd.DataFrame, individuals:pd.DataFrame, verbose:bool=False) -> pd.DataFrame:
     jdf = df.join(individuals)
     rm = jdf.loc[jdf.index.get_level_values(1) > jdf.tag_lost]
