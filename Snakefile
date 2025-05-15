@@ -34,19 +34,19 @@ rule filter:
     script:
         "py/filter.py"
 
-rule model_make_night_roosts_median:
+rule make_preproc_night_roosts_median:
     input:
         "data/processed/clean.parquet"
     output:
-        "data/processed/m_night_roosts_median.parquet"
+        "data/processed/night_roosts_median.parquet"
     script:
-        "py/model_night_roosts_median.py"
+        "py/preproc_night_roosts_median.py"
 
 rule make_feat_night_communal:
     params:
         radius=config['feat_night_communal']['radius'],
     input:
-        "data/processed/m_night_roosts_median.parquet"
+        "data/processed/night_roosts_median.parquet"
     output:
         "data/processed/feat_night_communal.parquet"
     script:
