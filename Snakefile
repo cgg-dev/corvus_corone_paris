@@ -42,6 +42,29 @@ rule model_make_night_roosts_median:
     script:
         "py/model_night_roosts_median.py"
 
+rule make_feat_night_communal:
+    params:
+        radius=config['feat_night_communal']['radius'],
+    input:
+        "data/processed/m_night_roosts_median.parquet"
+    output:
+        "data/processed/feat_night_communal.parquet"
+    script:
+        "py/feat_night_communal.py"
+
+rule make_feat_1styear_communal_roosting:
+    input:
+        "data/processed/feat_night_communal.parquet"
+    output:
+        "data/processed/feat_1styear_communal_roosting.parquet"
+    run:
+        import pandas as pd
+        import geopandas as gpd
+        gpd.read_parquet(input[0]) \
+            .groupby([pd.Grouper(level=0),pd.Grouper(level=1)]).apply(lambda x:x.communal.sum()/x.communal.count()) \
+            .rename('1styear_communal_roosting') \
+            .to_frame().to_parquet(output[0])
+
 #
 # extract natal territories candidates
 #
