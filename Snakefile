@@ -34,6 +34,16 @@ rule filter:
     script:
         "py/filter.py"
 
+rule resample:
+    params:
+        limit=config['resample']['limit']
+    input:
+        "data/processed/clean.parquet",
+    output:
+        "data/processed/resampled.parquet",
+    script:
+        "py/resample.py"
+
 rule make_preproc_night_roosts_median:
     input:
         "data/processed/clean.parquet"

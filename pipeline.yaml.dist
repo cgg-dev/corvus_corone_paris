@@ -5,6 +5,9 @@ filtering:
     max_km: 60
 territorial_season_months: [5,6,7,8,9,10,11,12]
 
+resample:
+    limit: 3
+
 feat_night_communal:
     radius: 25.
 
